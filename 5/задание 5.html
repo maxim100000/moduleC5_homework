@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Picsum.photos</title>
+</head>
+<body>
+
+<label for="num-of-page" style="display: block"> Номер страницы</label>
+
+<input id="num-of-page">
+<label for="limit" style="display: block">Лимит</label>
+<input id="limit">
+
+<button
+        style="width: 100px; height: 21px; background-color: red; border-radius: 5px; box-shadow: rgba(100, 100, 100, 
+        0.8) 3px -1px;display: block; margin-top: 10px; margin-bottom: 10px; color: black" title="запрос">Запрос
+</button>
+<div>
+</div>
+<script>
+
+    const but = document.querySelector('button');
+
+    function checkInput(inp) {
+        return !(/^[1-9]$|^10$/.test(inp.value));
+    }
+
+    function displayWarning(str) {
+        let elem = document.createElement('p');
+        elem.innerText = `${str} вне диапазона от 1 до 10`;
+        document.querySelectorAll('img, p').forEach(x => x.remove());
+        document.body.append(elem);
+    }
+
+    but.addEventListener('click', async () => {
+        const inp1 = document.querySelector('#num-of-page');
+        const inp2 = document.querySelector('#limit');
+
+        if (checkInput(inp1) && checkInput(inp2)) {
+            displayWarning('Номер страницы и лимит');
+
+        } else if (checkInput(inp1)) {
+            displayWarning('Номер страницы');
+
+        } else if (checkInput(inp2)) {
+            displayWarning('Лимит');
+        } else {
+            localStorage.clear();
+            document.querySelectorAll('img, p').forEach((x) => x.remove());
+            const req = (await fetch(`https://picsum.photos/v2/list?page=${inp1.value}&limit=${inp2.value}`)).json();
+            req.then((imgs) => {
+                for (const el of imgs) {
+                    const img = document.createElement('img');
+                    img.src = el.download_url;
+                    img.width = 300;
+                    img.height = 300
+                    img.style.marginTop = '10px';
+                    img.style.marginRight = '10px';
+                    document.querySelector('div').append(img);
+                    localStorage.setItem(`${el.id}`, `${el.download_url}`)
+                }
+            })
+        }
+    });
+
+    if (localStorage.length > 0) {
+        for (const key in localStorage) {
+            if (localStorage.hasOwnProperty(key)){
+                
+                const img = document.createElement('img');
+                img.src = localStorage.getItem(key);
+                img.width = 300;
+                img.height = 300
+                img.style.marginTop = '10px';
+                img.style.marginRight = '10px';
+                document.querySelector('div').append(img);
+            }
+        }
+    }
+
+
+</script>
+</body>
+</html>

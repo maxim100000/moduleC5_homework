@@ -1,0 +1,53 @@
+00<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Picsum.photos</title>
+</head>
+<body>
+<label> Нужно выбрать число в диапазоне от 1 до 10
+    <input type="number">
+</label>
+<button
+        style="width: 100px; height: 21px; background-color: red; border-radius: 5px; box-shadow: rgba(100, 100, 100, 
+        0.8) 3px -1px; margin-top: 10px; margin-bottom: 10px; color: black">Нажми меня</button>
+<div></div>
+<script>
+    let but = document.querySelector('button');
+    let inp = document.querySelector('input');
+    but.addEventListener('click', () => {
+        if (!inp.value || inp.value <= 0 || inp.value > 10) {
+            let elem = document.createElement('p')
+            elem.innerText = 'Число вне диапазона от 1 до 10'
+            document.querySelectorAll('img').forEach(x => x.remove())
+            document.body.append(elem)
+
+        } else {
+
+            let pars = new XMLHttpRequest();
+            pars.responseType = 'json';
+            pars.onloadend = () => {
+                for (let i of pars.response) {
+                    let img = document.createElement('img');
+                    img.src = i['download_url'];
+                    img.width = 400;
+                    img.height = 300;
+                    img.style.marginRight = '5px'
+                    document.querySelectorAll('p').forEach(x => x.remove())
+                     document.querySelector('div').append(img);
+                }
+
+            }
+            pars.open('get', `https://picsum.photos/v2/list?limit=${inp.value}`);
+            pars.send()
+
+        }
+
+
+    })
+
+
+</script>
+</body>
+</html>
